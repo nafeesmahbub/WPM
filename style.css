@@ -1,0 +1,79 @@
+body {
+  background-color: #E6E6E6;
+  font-family: 'Roboto', sans-serif;
+}
+
+.jumbotron{
+  
+  background-position: 0% 55%;
+  background-size: cover;
+}
+
+.jumbotron h1{
+    color: #fff;
+    padding-left: 24px;
+}
+
+.jumbotron p{
+    color: #fff;
+    opacity: 0.8;
+    padding-left: 32px;
+}
+
+.onesidedropshadow {
+  -webkit-box-shadow: 0 8px 6px -6px black;
+  -moz-box-shadow: 0 8px 6px -6px black;
+  box-shadow: 0 8px 50px -6px black;
+  padding: 2px;
+}
+
+h2 {
+  padding-top: 3px;
+  padding-bottom: 16px;
+  opacity: 0.5;
+}
+
+.blocks{
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 15px;
+  padding-bottom:15px;
+}
+
+.border{
+  border-style: solid;
+  border-width: 1px;
+  border-color: #CCC;
+  border-radius: 0px 25px 25px 0px;
+}
+
+.resetBtn{
+  position: absolute;
+  top:0;
+  right: 0;
+  margin-right: 30px;
+}
+
+.paragraph{
+  line-height: 250%;
+  text-align: justify;
+}
+
+.alert{
+  margin-top: 5px;
+}
+
+.highlight {
+  background-color: #fff34d;
+  -moz-border-radius: 5px; /* FF1+ */
+  -webkit-border-radius: 5px; /* Saf3-4 */
+  border-radius: 5px; /* Opera 10.5, IE 9, Saf5, Chrome */
+  -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.7); /* FF3.5+ */
+  -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.7); /* Saf3.0+, Chrome */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.7); /* Opera 10.5+, IE 9.0 */
+}
+
+.highlight {
+   padding:1px 4px;
+   margin:0 -4px;
+}

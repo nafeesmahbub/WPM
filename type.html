@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html ng-app="wpmCalculator">
+
+<head>
+    <title>WPM Calculator</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="Words per minute calculator built with HTML, CSS, JavaScript, jQuery and Bootstrap.">
+    <meta name="author1" content="Ryan Samarajeewa">
+    <meta name="author2" content="Andy Yang">
+
+    <!--favicon-->
+    <link rel="icon" href="favicon.ico" type="image/png">
+    <!--Font Awesome-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+    <!--Roboto font from Google-->
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+
+    <!-- socket.io -->
+    <script type="text/javascript" src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/p5.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/addons/p5.dom.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/addons/p5.sound.min.js"></script>
+
+    <!--jQuery-->
+    <script src="/jQuery.js"></script>
+
+    <!-- jQuery Sortable -->
+    <script src="https://rawgit.com/padolsey/jQuery-Plugins/master/sortElements/jquery.sortElements.js"></script>
+
+    <!--Bootstrap-->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <!-- Optional theme -->
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">-->
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <!--Local stylesheet-->
+    <link rel="stylesheet" href="/style.css">
+
+    <!--Local script-->
+    <script src="/main.js"></script>
+    <script src="/type.js"></script>
+
+</head>
+
+<body>
+    <!--header-->
+    <div class="onesidedropshadow">
+        <h4>Type ID: <label id="sessionId"></label></h4>
+
+        <table id="online_users" class="table table-dark">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Socket ID</th>
+                    <th scope="col">Last</th>
+                    <th scope="col" id="wpm_header">WPM</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="container-fluid">
+
+        <div class="row ">
+
+            <div class="col-md-12 text-center">
+                <h2>Click the textbox, and copy the content on the left.</h2>
+                <div id="WPM"></div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <!--generated paragraphs-->
+            <div id="paragraph" class="lead paragraph col-md-6  blocks border">
+                <p class="paragraph"></p>
+            </div>
+            <!--textarea-->
+            <div class="col-md-6  blocks">
+                <div class="form-group ">
+                    <label for="comment">The timer starts when a key is pressed.</label>
+                    <button type="button" class="resetBtn btn btn-default"><i class="fa fa-refresh"></i> Reset</button>
+
+                    <textarea name="keyword" class="form-control" rows="13" id="userInput" onkeypress="CallBoth(event)" onkeydown="BackSpace(event)"></textarea>
+                    <!--alert-->
+                    <div class="alert alert-danger alert-dismissible text-center" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <strong>Warning!</strong> The timer is still running. You must finish typing all of the content!
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!--footer-->
+        <div class="row">
+            <div class="col-md-12">
+                <footer class="footer">
+                    <div class="container">
+                    </div>
+                </footer>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+        jQuery.fn.highlight = function(pat) {
+
+            function innerHighlight(node, pat) {
+
+                var skip = 0;
+
+                if (node.nodeType == 3) {
+
+                    var pos = node.data.toUpperCase().indexOf(pat);
+
+                    if (pos >= 0) {
+
+                        var spannode = document.createElement('span');
+                        spannode.className = 'highlight';
+                        var middlebit = node.splitText(pos);
+                        var endbit = middlebit.splitText(pat.length);
+                        var middleclone = middlebit.cloneNode(true);
+
+                        spannode.appendChild(middleclone);
+                        middlebit.parentNode.replaceChild(spannode, middlebit);
+                        skip = 1;
+
+                    }
+
+                } else if (node.nodeType == 1 && node.childNodes && !/(script|style) /i.test(node.tagName)) {
+
+                    for (var i = 0; i < node.childNodes.length; ++i) {
+
+                        i += innerHighlight(node.childNodes[i], pat);
+
+                    }
+
+                }
+
+                return skip;
+
+            }
+
+            return this.each(function() {
+
+                innerHighlight(this, pat.toUpperCase());
+
+            });
+
+        };
+
+        jQuery.fn.removeHighlight = function() {
+
+            function newNormalize(node) {
+
+                for (var i = 0, children = node.childNodes, nodeCount = children.length; i < nodeCount; i++) {
+
+                    var child = children[i];
+
+                    if (child.nodeType == 1) {
+
+                        newNormalize(child);
+                        continue;
+
+                    }
+
+                    if (child.nodeType != 3) {
+                        continue;
+                    }
+
+                    var next = child.nextSibling;
+
+                    if (next == null || next.nodeType != 3) {
+                        continue;
+                    }
+
+                    var combined_text = child.nodeValue + next.nodeValue;
+                    new_node = node.ownerDocument.createTextNode(combined_text);
+                    node.insertBefore(new_node, child);
+                    node.removeChild(child);
+                    node.removeChild(next);
+                    i--;
+                    nodeCount--;
+
+                }
+
+            }
+
+            return this.find("span.highlight").each(function() {
+
+                var thisParent = this.parentNode;
+                thisParent.replaceChild(this.firstChild, this);
+                newNormalize(thisParent);
+
+            }).end();
+
+        };
+
+        $(function() {
+
+            $('#userInput').bind('keyup change', function(ev) {
+
+                // pull in the new value
+                var searchTerm = $(this).val();
+
+                // remove any old highlighted terms
+                $('body').removeHighlight();
+
+                // disable highlighting if empty
+                if (searchTerm) {
+
+                    // highlight the new term
+                    $('body').highlight(searchTerm);
+
+                }
+
+            });
+
+        });
+    </script>
+</body>
+
+</html>
